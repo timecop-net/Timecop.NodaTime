@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <PackageId>Timecop.NodaTime</PackageId>
+	  <Description>Timecop for NodaTime.</Description>
+	  <Authors>Dmytro Khmara</Authors>
+	  <Copyright>Copyright Dmytro Khmara</Copyright>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageTags>NodaTime;DateTime;Date;Time;Unit;Testing;</PackageTags>
+	  <PackageIcon>icon.png</PackageIcon>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <RepositoryType>git</RepositoryType>
+	  <RepositoryUrl>https://github.com/timecop-net/Timecop.NodaTime</RepositoryUrl>
+
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <Nullable>enable</Nullable>
+	  <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+	<Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+		<PropertyGroup>
+			<NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
+			<NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
+		</PropertyGroup>
+		<Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
+	</Target>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="" />
+		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
+
+		<PackageReference Include="MinVer" Version="4.3.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="Timecop.Core" Version="3.1.1" />
+		<PackageReference Include="NodaTime" Version="[3.0.0,4.0.0)" />
+	</ItemGroup>
+
+</Project>
