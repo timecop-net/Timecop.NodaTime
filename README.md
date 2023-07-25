@@ -21,7 +21,7 @@ Timecop.NodaTime allows you to freeze and travel in time. Just use the `NodaCloc
 ```csharp
 string Greet(DateTimeZone zone)
 {
-    var timeOfDay = NodaClock.GetCurrentInstant().InZone(zone).Hour switch // Use Clock instead of SystemClock.Instance
+    var timeOfDay = NodaClock.GetCurrentInstant().InZone(zone).Hour switch // Use NodaClock instead of SystemClock.Instance
     {
         >= 0 and < 6 => "night",
         >= 6 and < 12 => "morning",
@@ -34,8 +34,8 @@ string Greet(DateTimeZone zone)
 
 var zone = DateTimeZoneProviders.Tzdb["Europe/Kyiv"];
 
-// freeze at 2pm local time:
-using var tc = NodaTimecop.Frozen(new LocalDateTime(1990, 12, 2, 14, 0, 0, 0).InZone(zone, Resolvers.LenientResolver));
+// freeze at 2pm Kyiv time:
+using var tc = NodaTimecop.Frozen(o => o.At(14, 0, 0).InZone(zone));
 
 Greet(zone); // Good afternoon!
 
@@ -75,9 +75,18 @@ Clock.Now; // 1990-12-02 14:38:54 - time has changed
 // freeze at the current instant:
 var frozenAt = tc.Freeze();
 
+// freeze at the specific instant:
+var instant = Instant.FromUtc(1990, 12, 2, 14, 53, 27);
+var frozenAt = tc.Freeze(instant);
+
 // freeze at the specified ZonedDateTime:
 ZonedDateTime zonedDateTime = new LocalDateTime(1990, 12, 2, 14, 38, 51).InUtc();
 frozenAt = tc.Freeze(zonedDateTime);
+
+// freeze at the specified date or time using a PointInTimeBuilder:
+frozenAt = tc.Freeze(o => o.On(1990, 12, 2)
+                .At(14, 13, 51)
+                .InUtc());
 ```
 
 ### Traveling in time

@@ -1,7 +1,8 @@
 ﻿using System;
 using NodaTime;
+using TCop.Core;
 using TCop.Core.Context;
-using TCop.Core.Time;
+using TCop.NodaTime.Time.Builder;
 
 namespace TCop.NodaTime
 {
@@ -54,6 +55,17 @@ namespace TCop.NodaTime
             return new ZonedDateTime(frozenAtInstant, freezeAt.Zone);
         }
 
+        /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the specified date and time.</summary>
+        /// <param name="config">The function to configure the date and time to freeze at.</param>
+        /// <returns>The date and time with the kind of specified in <paramref name="config" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
+        public ZonedDateTime Freeze(Action<PointInTimeBuilder> config)
+        {
+            var builder = new PointInTimeBuilder();
+            config(builder);
+            var frozenAt = Freeze(PointInTimeToInstant(builder.Build(out var zone)));
+            return frozenAt.InZone(zone);
+        }
+
         /// <summary>Creates an instance of <see cref="T:TCop.NodaTime.NodaTimecop" /> and freezes it at the current instant.</summary>
         /// <returns>A frozen <see cref="T:TCop.NodaTime.NodaTimecop" /> instance.</returns>
         public static NodaTimecop Frozen()
@@ -80,6 +92,16 @@ namespace TCop.NodaTime
         {
             var timecop = new NodaTimecop();
             timecop.Freeze(frozenAt);
+            return timecop;
+        }
+
+        /// <summary>Creates an instance of <see cref="T:TCop.Timecop" /> and freezes it at the specified date and time.</summary>
+        /// <param name="config">The function to configure the date and time to freeze at.</param>
+        /// <returns>A frozen <see cref="T:TCop.NodaTime.NodaTimecop" /> instance.</returns>
+        public static NodaTimecop Frozen(Action<PointInTimeBuilder> config)
+        {
+            var timecop = new NodaTimecop();
+            timecop.Freeze(config);
             return timecop;
         }
 
