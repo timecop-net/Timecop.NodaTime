@@ -38,7 +38,7 @@ public class PointInTimeBuilderTests
 
         var zone = DateTimeZoneProviders.Tzdb["Europe/Kyiv"];
 
-        // freeze at 2pm local time:
+        // freeze at 2pm Kyiv time:
         using var tc = NodaTimecop.Frozen(o => o.At(14, 0, 0).InZone(zone));
 
         Greet(zone); // Good afternoon!

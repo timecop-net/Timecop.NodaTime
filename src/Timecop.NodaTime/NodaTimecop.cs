@@ -28,40 +28,40 @@ namespace TCop.NodaTime
             _contextStore.ResetContext();
         }
 
-        /// <summary>Freezes an instance of <see cref="T:TCop.NodaTime.NodaTimecop" /> at the current instant.</summary>
-        /// <returns>The instant the <see cref="T:TCop.NodaTime.NodaTimecop" /> instance was frozen at.</returns>
+        /// <summary>Freezes the time at the current instant.</summary>
+        /// <returns>The instant the time was frozen at.</returns>
         public Instant Freeze()
         {
             var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime now) => context.Freeze(now));
             return PointInTimeToInstant(frozenAt);
         }
 
-        /// <summary>Freezes an instance of <see cref="T:TCop.NodaTime.NodaTimecop" /> at the given instant.</summary>
-        /// <param name="freezeAt">The instant to freeze at.</param>
-        /// <returns>The instant the <see cref="T:TCop.NodaTime.NodaTimecop" /> instance was frozen at.</returns>
-        public Instant Freeze(Instant freezeAt)
+        /// <summary>Freezes the time at the given instant.</summary>
+        /// <param name="destination">The instant to freeze at.</param>
+        /// <returns>The instant the time was frozen at.</returns>
+        public Instant Freeze(Instant destination)
         {
-            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime now) => context.Freeze(InstantToPointInTime(freezeAt)));
+            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime now) => context.Freeze(InstantToPointInTime(destination)));
             return PointInTimeToInstant(frozenAt);
         }
 
-        /// <summary>Freezes an instance of <see cref="T:TCop.NodaTime.NodaTimecop" /> at the specified ZonedDateTime.</summary>
-        /// <param name="freezeAt">The date and time to freeze at.</param>
-        /// <returns>The date and time in the time zone that the <see cref="T:TCop.NodaTime.NodaTimecop" /> instance was frozen at.</returns>
-        public ZonedDateTime Freeze(ZonedDateTime freezeAt)
+        /// <summary>Freezes the time at the specified ZonedDateTime.</summary>
+        /// <param name="destination">The date and time to freeze at.</param>
+        /// <returns>The date and time with a time zone that the time was frozen at.</returns>
+        public ZonedDateTime Freeze(ZonedDateTime destination)
         {
-            var frozenAt = _contextStore.Mutate((ref TimecopContext context) => context.Freeze(InstantToPointInTime(freezeAt.ToInstant())));
+            var frozenAt = _contextStore.Mutate((ref TimecopContext context) => context.Freeze(InstantToPointInTime(destination.ToInstant())));
             var frozenAtInstant = PointInTimeToInstant(frozenAt);
-            return new ZonedDateTime(frozenAtInstant, freezeAt.Zone);
+            return new ZonedDateTime(frozenAtInstant, destination.Zone);
         }
 
-        /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the specified date and time.</summary>
-        /// <param name="config">The function to configure the date and time to freeze at.</param>
-        /// <returns>The date and time with the kind of specified in <paramref name="config" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
-        public ZonedDateTime Freeze(Action<PointInTimeBuilder> config)
+        /// <summary>Freezes the time at the specified date and time.</summary>
+        /// <param name="configureDestination">The function to configure the date and time to freeze at.</param>
+        /// <returns>The date and time with a time zone that the time was frozen at.</returns>
+        public ZonedDateTime Freeze(Action<PointInTimeBuilder> configureDestination)
         {
             var builder = new PointInTimeBuilder();
-            config(builder);
+            configureDestination(builder);
             var frozenAt = Freeze(PointInTimeToInstant(builder.Build(out var zone)));
             return frozenAt.InZone(zone);
         }
@@ -76,22 +76,22 @@ namespace TCop.NodaTime
         }
 
         /// <summary>Creates an instance of <see cref="T:TCop.NodaTime.NodaTimecop" /> and freezes it at the given instant.</summary>
-        /// <param name="freezeAt">The instant to freeze at.</param>
+        /// <param name="destination">The instant to freeze at.</param>
         /// <returns>A frozen <see cref="T:TCop.NodaTime.NodaTimecop" /> instance.</returns>
-        public static NodaTimecop Frozen(Instant freezeAt)
+        public static NodaTimecop Frozen(Instant destination)
         {
             var timecop = new NodaTimecop();
-            timecop.Freeze(freezeAt);
+            timecop.Freeze(destination);
             return timecop;
         }
 
         /// <summary>Creates an instance of <see cref="T:TCop.NodaTime.NodaTimecop" /> and freezes it at the specified date and time with a time zone.</summary>
-        /// <param name="frozenAt">The date and time to freeze at.</param>
+        /// <param name="destination">The date and time to freeze at.</param>
         /// <returns>A frozen <see cref="T:TCop.NodaTime.NodaTimecop" /> instance.</returns>
-        public static NodaTimecop Frozen(ZonedDateTime frozenAt)
+        public static NodaTimecop Frozen(ZonedDateTime destination)
         {
             var timecop = new NodaTimecop();
-            timecop.Freeze(frozenAt);
+            timecop.Freeze(destination);
             return timecop;
         }
 
@@ -113,14 +113,49 @@ namespace TCop.NodaTime
             return PointInTimeToInstant(resumedTime);
         }
 
-        /// <summary>Moves in time backward or forward by the specified amount of time.</summary>
+        /// <summary>Moves in time backward or forward by the given amount of time.</summary>
         /// <param name="duration">The amount of time to travel by. Can be positive or negative.</param>
-        /// <returns>The instant the <see cref="T:TCop.Timecop" /> instance has traveled to.</returns>
+        /// <returns>The instant that the time has traveled to.</returns>
         public Instant TravelBy(Duration duration)
         {
-            var timeAfterTravel = _contextStore.Mutate((ref TimecopContext context) => context.TravelBy(duration.ToTimeSpan()));
+            var timeAfterTravel = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.TravelBy(duration.ToTimeSpan(), realNow));
             return PointInTimeToInstant(timeAfterTravel);
         }
 
+        /// <summary>Moves the time to the given instant.</summary>
+        /// <param name="destination">The instant to travel to.</param>
+        /// <returns>The instant the time has traveled to.</returns>
+        public Instant TravelTo(Instant destination)
+        {
+            var timeAfterTravel = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => 
+                context.TravelTo(InstantToPointInTime(destination), realNow));
+            return PointInTimeToInstant(timeAfterTravel);
+        }
+
+        /// <summary>Moves the time to the specified ZonedDateTime.</summary>
+        /// <param name="destination">The date and time to travel to.</param>
+        /// <returns>The date and time with a time zone that the time has traveled to.</returns>
+        public ZonedDateTime TravelTo(ZonedDateTime destination)
+        {
+            var timeAfterTravel = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) =>
+                context.TravelTo(InstantToPointInTime(destination.ToInstant()), realNow));
+            var instantAfterTravel = PointInTimeToInstant(timeAfterTravel);
+            return new ZonedDateTime(instantAfterTravel, destination.Zone);
+        }
+
+        /// <summary>Moves the time to the specified date and time.</summary>
+        /// <param name="configureDestination">The function to configure the date and time to travel to.</param>
+        /// <returns>The date and time with a time zone that the time has traveled to.</returns>
+        public ZonedDateTime TravelTo(Action<PointInTimeBuilder> configureDestination)
+        {
+            var builder = new PointInTimeBuilder();
+            configureDestination(builder);
+            var travelTo =builder.Build(out var zone);
+
+            var timeAfterTravel = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) =>
+                context.TravelTo(travelTo, realNow));
+
+            return PointInTimeToInstant(timeAfterTravel).InZone(zone);
+        }
     }
 }
