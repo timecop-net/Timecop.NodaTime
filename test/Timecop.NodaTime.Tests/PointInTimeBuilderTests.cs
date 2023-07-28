@@ -7,7 +7,6 @@ namespace TCop.NodaTime.Tests;
 
 public class PointInTimeBuilderTests
 {
-    private static readonly TimeSpan DateTimeComparisonPrecision = TimeSpan.FromMilliseconds(50);
     private static readonly ulong InstantComparisonPrecision = (ulong)Duration.FromMilliseconds(50).TotalTicks;
 
     private readonly DateTimeZone _kyivZone = DateTimeZoneProviders.Tzdb["Europe/Kyiv"];
@@ -18,35 +17,10 @@ public class PointInTimeBuilderTests
     [Fact]
     public void InUtc_ShouldReturnCurrentUtcTime()
     {
-        //_builder.InUtc();
+        _builder.InUtc();
 
-        //_builder.Build(out var zone).UnixEpochTicks.Should().BeCloseTo(_systemClock.GetCurrentInstant().ToUnixTimeTicks(), InstantComparisonPrecision);
-        //zone.Should().Be(DateTimeZone.Utc);
-
-        string Greet(DateTimeZone zone)
-        {
-            var timeOfDay = NodaClock.GetCurrentInstant().InZone(zone).Hour switch // Use NodaClock instead of SystemClock.Instance
-            {
-                >= 0 and < 6 => "night",
-                >= 6 and < 12 => "morning",
-                >= 12 and < 18 => "afternoon",
-                _ => "evening"
-            };
-
-            return $"Good {timeOfDay}!";
-        }
-
-        var zone = DateTimeZoneProviders.Tzdb["Europe/Kyiv"];
-
-        // freeze at 2pm Kyiv time:
-        using var tc = NodaTimecop.Frozen(o => o.At(14, 0, 0).InZone(zone));
-
-        Greet(zone); // Good afternoon!
-
-        // travel to 8pm local time:
-        tc.TravelBy(Duration.FromHours(6));
-
-        Greet(zone); // Good evening!
+        _builder.Build(out var zone).UnixEpochTicks.Should().BeCloseTo(_systemClock.GetCurrentInstant().ToUnixTimeTicks(), InstantComparisonPrecision);
+        zone.Should().Be(DateTimeZone.Utc);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using FluentAssertions.NodaTime;
 using NodaTime;
 
 namespace TCop.NodaTime.Tests;
@@ -21,6 +21,6 @@ public class NodaTimecopResumeTests
 
         resumedTime.Should().Be(frozenAt);
 
-        (NodaClock.GetCurrentInstant() - frozenAt.Plus(Duration.FromMilliseconds(200))).Should().BeLessOrEqualTo(InstantComparisonPrecision);
+        NodaClock.GetCurrentInstant().Should().BeCloseTo(frozenAt.Plus(Duration.FromMilliseconds(200)), InstantComparisonPrecision);
     }
 }
