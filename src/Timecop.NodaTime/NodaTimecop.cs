@@ -113,6 +113,14 @@ namespace TCop.NodaTime
             return PointInTimeToInstant(resumedTime);
         }
 
+        /// <summary>Resets the <see cref="T:TCop.NodaTime.NodaTimecop" /> to its initial state so that it represents the current time.</summary>
+        /// <returns>The instant that represents the current time.</returns>
+        public Instant Reset()
+        {
+            var resetTime = _contextStore.Mutate((ref TimecopContext context) => context.Reset());
+            return PointInTimeToInstant(resetTime);
+        }
+
         /// <summary>Moves in time backward or forward by the given amount of time.</summary>
         /// <param name="duration">The amount of time to travel by. Can be positive or negative.</param>
         /// <returns>The instant that the time has traveled to.</returns>

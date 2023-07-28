@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.NodaTime;
 using NodaTime;
 using NodaTime.TimeZones;
 
@@ -22,7 +23,7 @@ public class NodaTimecopFreezeTests
         Thread.Sleep(100);
 
         NodaClock.GetCurrentInstant().Should().Be(frozenAt);
-        (realTimeFrozenAt - frozenAt).Should().BeLessOrEqualTo(InstantComparisonPrecision);
+        frozenAt.Should().BeCloseTo(realTimeFrozenAt, InstantComparisonPrecision);
     }
 
     [Fact]

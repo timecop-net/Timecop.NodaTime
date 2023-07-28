@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using FluentAssertions.NodaTime;
 using NodaTime;
 using NodaTime.TimeZones;
 
@@ -6,8 +6,6 @@ namespace TCop.NodaTime.Tests;
 
 public class NodaTimecopTravelTests
 {
-    private readonly IClock _systemClock = SystemClock.Instance;
-
     private static readonly Duration InstantComparisonPrecision = Duration.FromMilliseconds(50);
 
     private readonly DateTimeZone _kyivZone = DateTimeZoneProviders.Tzdb["Europe/Kyiv"];
@@ -32,9 +30,7 @@ public class NodaTimecopTravelTests
 
         Thread.Sleep(100);
 
-        NodaClock.GetCurrentInstant().ToUnixTimeTicks().Should().BeCloseTo(
-            traveledTo.Plus(Duration.FromMilliseconds(100)).ToUnixTimeTicks(), 
-            (ulong)InstantComparisonPrecision.TotalTicks);
+        NodaClock.GetCurrentInstant().Should().BeCloseTo(traveledTo.Plus(Duration.FromMilliseconds(100)), InstantComparisonPrecision);
 
         traveledTo.Should().Be(travelTo);
     }
@@ -49,9 +45,7 @@ public class NodaTimecopTravelTests
 
         Thread.Sleep(100);
 
-        NodaClock.GetCurrentInstant().ToUnixTimeTicks().Should().BeCloseTo(
-            twoPmInKyiv.Plus(Duration.FromMilliseconds(100)).ToInstant().ToUnixTimeTicks(),
-            (ulong)InstantComparisonPrecision.TotalTicks);
+        NodaClock.GetCurrentInstant().Should().BeCloseTo(twoPmInKyiv.Plus(Duration.FromMilliseconds(100)).ToInstant(), InstantComparisonPrecision);
 
         traveledTo.Should().Be(twoPmInKyiv);
     }
@@ -67,9 +61,7 @@ public class NodaTimecopTravelTests
 
         var twoPmInKyiv = new LocalDateTime(1990, 12, 2, 14, 53, 27).InZone(_kyivZone, Resolvers.LenientResolver);
 
-        NodaClock.GetCurrentInstant().ToUnixTimeTicks().Should().BeCloseTo(
-            twoPmInKyiv.Plus(Duration.FromMilliseconds(100)).ToInstant().ToUnixTimeTicks(),
-            (ulong)InstantComparisonPrecision.TotalTicks);
+        NodaClock.GetCurrentInstant().Should().BeCloseTo(twoPmInKyiv.Plus(Duration.FromMilliseconds(100)).ToInstant(), InstantComparisonPrecision);
         
         traveledTo.Should().Be(twoPmInKyiv);
     }
