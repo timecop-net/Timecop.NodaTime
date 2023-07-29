@@ -32,7 +32,7 @@ namespace TCop.NodaTime
         /// <returns>The instant the time was frozen at.</returns>
         public Instant Freeze()
         {
-            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime now) => context.Freeze(now));
+            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.Freeze(realNow));
             return PointInTimeToInstant(frozenAt);
         }
 
@@ -41,7 +41,7 @@ namespace TCop.NodaTime
         /// <returns>The instant the time was frozen at.</returns>
         public Instant Freeze(Instant destination)
         {
-            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime now) => context.Freeze(InstantToPointInTime(destination)));
+            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.FreezeAt(InstantToPointInTime(destination), realNow));
             return PointInTimeToInstant(frozenAt);
         }
 
@@ -50,7 +50,7 @@ namespace TCop.NodaTime
         /// <returns>The date and time with a time zone that the time was frozen at.</returns>
         public ZonedDateTime Freeze(ZonedDateTime destination)
         {
-            var frozenAt = _contextStore.Mutate((ref TimecopContext context) => context.Freeze(InstantToPointInTime(destination.ToInstant())));
+            var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.FreezeAt(InstantToPointInTime(destination.ToInstant()), realNow));
             var frozenAtInstant = PointInTimeToInstant(frozenAt);
             return new ZonedDateTime(frozenAtInstant, destination.Zone);
         }
@@ -109,7 +109,7 @@ namespace TCop.NodaTime
         /// <returns>The instant the <see cref="T:TCop.NodaTime.NodaTimecop" /> instance represented when it was resumed.</returns>
         public Instant Resume()
         {
-            var resumedTime = _contextStore.Mutate((ref TimecopContext context, PointInTime now) => context.Resume(now));
+            var resumedTime = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.Resume(realNow));
             return PointInTimeToInstant(resumedTime);
         }
 
