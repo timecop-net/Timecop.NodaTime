@@ -34,7 +34,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 
-		<PackageReference Include="Timecop.Core" Version="4.1.0" />
+		<PackageReference Include="Timecop.Core" Version="4.2.0" />
 		<PackageReference Include="NodaTime" Version="[3.0.0,4.0.0)" />
 	</ItemGroup>
 
