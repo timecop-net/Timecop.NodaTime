@@ -10,8 +10,17 @@ namespace TCop.NodaTime
     {
         private readonly TimecopContextStore _contextStore = new();
 
-        public static Instant Instant => Instant.FromUnixTimeTicks(TimecopContextStore.AsyncContextUtcNow.UnixEpochTicks);
+        public static Instant Instant => Instant.FromUnixTimeTicks(TimecopContextStore.AsyncContextNow.UnixEpochTicks);
 
+        /// <summary>
+        /// Returns an <see cref="T:NodaTime.IClock" /> implementation that you can pass to your code in the tests.
+        /// </summary>
+        public IClock Clock { get; }
+
+        public NodaTimecop()
+        {
+            Clock = new NodaTimecopClock(() => PointInTimeToInstant(_contextStore.InstanceContextNow));
+        }
 
         private static PointInTime InstantToPointInTime(Instant instant)
         {
